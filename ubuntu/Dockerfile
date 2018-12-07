@@ -13,12 +13,17 @@ RUN apt-get update && apt-get install -y \
         && apt-get -y upgrade \
         && apt-get clean autoclean \
         && apt-get autoremove -y \
-        && useradd -m steam
+        && mkdir -p /opt/steamcmd \
+        && useradd -m steam \
+        && chown -R steam /opt \
+        && chmod -R 744 /opt
 
 USER steam
 
-RUN mkdir -p /home/steam/steamcmd && cd /home/steam/steamcmd \
+RUN cd /opt/steamcmd/ \
     && curl -sqL "${STEAMCMD_URL}" | tar zxvf - \
-    && rm -rf /var/lib/{apt,dpkg,cache,log} /tmp/* steamcmd_linux.tar.gz
+    && rm -rf /var/lib/{apt,dpkg,cache,log} /tmp/* steamcmd_linux.tar.gz 
 
-VOLUME [ "/home/steam/steamcmd" ]
+VOLUME [ "/opt/steamcmd" ]
+
+ENTRYPOINT ["/opt/steamcmd/steamcmd.sh"]
